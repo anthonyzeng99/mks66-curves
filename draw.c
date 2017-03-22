@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <math.h>
 
 #include "ml6.h"
 #include "display.h"
@@ -19,6 +20,23 @@
 void add_circle( struct matrix * points, 
 		 double cx, double cy, double cz,
 		 double r, double step ) {
+
+  double x1, x2, y1, y2;
+  x2 = cx + r;
+  y2 = cy;
+
+  double theta;
+  double t = 0;
+  while (t < 1.001){
+    theta = 2 * t * M_PI;
+    x1 = x2;
+    y1 = y2;
+    x2 = cx + r * cos(theta);
+    y2 = cy + r * sin(theta);
+    add_edge(points, x1, y1, cz, x2, y2, cz);  
+    t += step;
+  }
+  
 }
 
 /*======== void add_curve() ==========
@@ -45,6 +63,24 @@ void add_curve( struct matrix *points,
 		double x2, double y2, 
 		double x3, double y3, 
 		double step, int type ) {
+
+  struct matrix *xcoefs = generate_curve_coefs(x0, x1, x2, x3, type);
+  struct matrix *ycoefs = generate_curve_coefs(y0, y1, y2, y3, type);
+
+  double t = 0;
+  while ( t < 1.001 ) {
+    x0 = x1;
+    y0 = y1;
+
+    t += step;
+       
+    x1 = (xcoefs->m[0][0] * pow(t, 3)) + (xcoefs->m[1][0] * pow(t, 2)) + (xcoefs->m[2][0] * t) + (xcoefs->m[3][0]);
+    y1 = (ycoefs->m[0][0] * pow(t, 3)) + (ycoefs->m[1][0] * pow(t, 2)) + (ycoefs->m[2][0] * t) + (ycoefs->m[3][0]);
+    
+    add_edge(points, x0, y0, 0, x0, y0, 0);
+    
+  
+  }
 }
 
 
